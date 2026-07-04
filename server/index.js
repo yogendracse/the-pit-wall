@@ -4,9 +4,13 @@ import sessionsRouter from "./routes/sessions.js";
 import sessionRouter from "./routes/session.js";
 import strategyRouter from "./routes/strategy.js";
 import { cacheStats } from "./lib/openf1Client.js";
+import { startLiveMonitoring } from "./lib/liveStore.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Initialize SignalR monitoring (will fail back to OpenF1 if off-line)
+startLiveMonitoring();
 
 app.use(cors());
 app.use(express.json());
