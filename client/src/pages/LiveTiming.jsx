@@ -113,6 +113,15 @@ export default function LiveTiming() {
   );
 }
 
+function formatIncidentTime(date) {
+  if (!date) return "";
+  const parsed = new Date(date);
+  if (!isNaN(parsed.getTime())) {
+    return parsed.toLocaleTimeString();
+  }
+  return date; // Fallback to raw string if relative offset e.g. "00:14:18.746"
+}
+
 function IncidentCard({ message }) {
   const isWarning = /yellow|safety car|red flag|caution/i.test(message.flag || message.category || "");
   return (
@@ -124,7 +133,7 @@ function IncidentCard({ message }) {
       <p className="text-xs font-bold uppercase">{message.category}</p>
       <p className="text-xs text-[var(--color-muted)]">{message.message}</p>
       <p className="text-[10px] text-[var(--color-muted)] mt-0.5">
-        {message.date ? new Date(message.date).toLocaleTimeString() : ""}
+        {formatIncidentTime(message.date)}
       </p>
     </div>
   );
