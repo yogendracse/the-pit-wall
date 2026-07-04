@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build artifacts
+client/dist/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs and test outputs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Local environment/private files
+.env
+.env.local
+.env.*.local
+.gemini/
+.claude/
