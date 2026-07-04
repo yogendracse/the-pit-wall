@@ -3,6 +3,7 @@ import cors from "cors";
 import sessionsRouter from "./routes/sessions.js";
 import sessionRouter from "./routes/session.js";
 import strategyRouter from "./routes/strategy.js";
+import ltaRouter from "./routes/lta.js";
 import { cacheStats } from "./lib/openf1Client.js";
 import { startLiveMonitoring } from "./lib/liveStore.js";
 
@@ -20,6 +21,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true, ...cacheStats() }));
 app.use("/api", sessionsRouter);
 app.use("/api/session", sessionRouter);
 app.use("/api/strategy", strategyRouter);
+app.use("/api/lta", ltaRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);

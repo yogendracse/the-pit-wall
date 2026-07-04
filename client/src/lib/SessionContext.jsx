@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { api } from "./api";
 
 const SessionContext = createContext(null);
@@ -8,11 +9,13 @@ export function SessionProvider({ children }) {
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryKey = searchParams.get("session_key");
 
   useEffect(() => {
     let cancelled = false;
-    const searchParams = new URLSearchParams(window.location.search);
-    const queryKey = searchParams.get("session_key");
+    setLoading(true);
+    setError(null);
 
     async function init() {
       try {
@@ -43,7 +46,7 @@ export function SessionProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [queryKey]);
 
   return (
     <SessionContext.Provider value={{ session, drivers, loading, error }}>

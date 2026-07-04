@@ -50,4 +50,7 @@ export const api = {
 
   projectDelta: (payload) => post("/strategy/project-delta", payload),
   undercut: (payload) => post("/strategy/undercut", payload),
+
+  ltaMeetings: (year) => get(`/lta/meetings/${year}`),
+  ltaDownload: (key) => get(`/lta/download/${key}`),
 };
