@@ -53,4 +53,5 @@ export const api = {
 
   ltaMeetings: (year) => get(`/lta/meetings/${year}`),
   ltaDownload: (key) => get(`/lta/download/${key}`),
+  ltaPlayback: (key) => get(`/lta/playback/${key}`),
 };

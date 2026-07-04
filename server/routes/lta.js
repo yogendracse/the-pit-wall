@@ -98,4 +98,68 @@ router.get("/download/:key", async (req, res, next) => {
   }
 });
 
+router.get("/playback/:key", async (req, res, next) => {
+  try {
+    const { key } = req.params;
+    
+    // Ensure data is cached/downloaded first
+    await getLTASessionState(key);
+
+    const files = [
+      { name: `${key}_TimingData.jsonStream`, topic: "TimingData" },
+      { name: `${key}_TimingAppData.jsonStream`, topic: "TimingAppData" },
+      { name: `${key}_TrackStatus.jsonStream`, topic: "TrackStatus" },
+      { name: `${key}_WeatherData.jsonStream`, topic: "WeatherData" },
+      { name: `${key}_RaceControlMessages.jsonStream`, topic: "RaceControlMessages" },
+    ];
+
+    const events = [];
+    for (const f of files) {
+      const filePath = path.join(CACHE_DIR, f.name);
+      if (!fs.existsSync(filePath)) continue;
+
+      const text = fs.readFileSync(filePath, "utf8");
+      const lines = text.split("\n");
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        if (line.length < 13) continue;
+
+        const offsetStr = line.substring(0, 12);
+        const jsonStr = line.substring(12);
+
+        try {
+          const offset = parseOffsetToSeconds(offsetStr);
+          const data = JSON.parse(jsonStr);
+          events.push({ offset, topic: f.topic, data });
+        } catch (e) {
+          // ignore corrupted lines
+        }
+      }
+    }
+
+    // Sort chronologically
+    events.sort((a, b) => a.offset - b.offset);
+
+    res.json({
+      key: parseInt(key),
+      totalDuration: events.length > 0 ? events[events.length - 1].offset : 0,
+      events,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+function parseOffsetToSeconds(str) {
+  const parts = str.split(":");
+  if (parts.length === 3) {
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    const seconds = parseFloat(parts[2]);
+    return hours * 3600 + minutes * 60 + seconds;
+  }
+  return parseFloat(str) || 0;
+}
+
 export default router;

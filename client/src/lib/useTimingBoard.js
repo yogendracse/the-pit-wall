@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "./api";
+import { useSession } from "./SessionContext";
 
 const POLL_MS = 15_000;
 
@@ -48,6 +49,9 @@ function pitCountByDriver(pits) {
 }
 
 export function useTimingBoard(sessionKey) {
+  const context = useSession();
+  const isPlayback = context?.isPlaybackMode;
+
   const [state, setState] = useState({
     rows: [],
     weather: null,
@@ -59,6 +63,19 @@ export function useTimingBoard(sessionKey) {
   const timerRef = useRef(null);
 
   useEffect(() => {
+    if (isPlayback) {
+      setState({
+        rows: context.simulatedData.timing || [],
+        weather: context.simulatedData.weather || null,
+        raceControl: context.simulatedData.incidents || [],
+        safetyCarWindow: context.simulatedData.trackStatus?.safetyCarWindow || { active: false },
+        stale: false,
+        loading: false,
+        error: null,
+      });
+      return;
+    }
+
     if (!sessionKey) return;
     let cancelled = false;
 
@@ -137,7 +154,7 @@ export function useTimingBoard(sessionKey) {
       cancelled = true;
       clearInterval(timerRef.current);
     };
-  }, [sessionKey]);
+  }, [sessionKey, isPlayback, context?.simulatedData]);
 
   return state;
 }
