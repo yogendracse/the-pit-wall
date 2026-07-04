@@ -7,7 +7,14 @@ async function get(path, params = {}) {
     if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, v);
   }
   const res = await fetch(url.pathname + url.search);
-  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
+  if (!res.ok) {
+    if (res.status === 502 || res.status === 401) {
+      throw new Error(
+        `OpenF1 API Lockdown (Status ${res.status}). A live F1 session is likely active. The free/unauthenticated tier is temporarily locked from 30 minutes before a session starts until 30 minutes after it ends. Please try again after the session window closes.`
+      );
+    }
+    throw new Error(`API ${res.status}: ${path}`);
+  }
   return res.json();
 }
 
